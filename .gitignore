@@ -1,0 +1,8 @@
+.env
+__pycache__/
+venv*/
+.venv*/
+.vscode
+*.db
+output.txt
+*.sqlite3
