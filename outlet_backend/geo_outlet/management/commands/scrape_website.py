@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from geo_outlet.utils import scrape_and_save_to_db
+from geo_outlet.utils.scrape_website_to_db import scrape_and_save_to_db
 
 class Command(BaseCommand):
     help = 'Scrape Subway locations and save to the database'

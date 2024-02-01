@@ -5,7 +5,8 @@ import json
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
-from .models import Outlet
+from ..models import Outlet
+from .geocoding import get_geocode
 
 def scrape_and_save_to_db(url, num_locations):
     # using selenium to load the page and execute javascript, because the items are generated using javascript
@@ -41,8 +42,9 @@ def scrape_and_save_to_db(url, num_locations):
                 latitude = 0.0
                 longitude = 0.0
 
-                latitude = float(location_item.get('data-latitude', 0.0))
-                longitude = float(location_item.get('data-longitude', 0.0))
+                # latitude = float(location_item.get('data-latitude', 0.0))
+                # longitude = float(location_item.get('data-longitude', 0.0))
+
 
                 # look for location_left and location_right divs
                 # one holds info the other holds links
@@ -77,6 +79,10 @@ def scrape_and_save_to_db(url, num_locations):
                             waze_link = links[0]['href']
                             google_link = links[1]['href']
 
+                coordinates = get_geocode(address)
+                if coordinates:
+                    latitude, longitude = coordinates
+                    
                 # insert data into db
                 outlet = Outlet(
                     name=outlet,
