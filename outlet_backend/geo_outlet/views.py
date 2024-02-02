@@ -1,5 +1,6 @@
 from rest_framework import serializers, generics
 from .models import Outlet
+from transformers import Pipeline
 
 class OutletSerializer(serializers.ModelSerializer):
     class Meta:

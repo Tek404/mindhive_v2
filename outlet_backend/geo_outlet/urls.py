@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import OutletList, OutletSearchList, search_outlets
+from .views import OutletList, OutletSearchList
 
 urlpatterns = [
     path('outlets/', OutletList.as_view(), name='outlet-list'),
