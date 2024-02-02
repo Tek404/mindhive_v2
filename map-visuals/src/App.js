@@ -27,6 +27,8 @@ const circleOptions = {
 
 export default function App() {
   const [markers, setMarkers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredMarkers, setFilteredMarkers] = useState([]);
 
   useEffect(() => {
     // Fetch data from the backend API
@@ -40,6 +42,7 @@ export default function App() {
           isWithinRadius: false
         }));
         setMarkers(updatedMarkers);
+        setFilteredMarkers(updatedMarkers); // Initially set filteredMarkers to all markers
       })
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
@@ -56,6 +59,32 @@ export default function App() {
     return false;
   };
 
+  // const handleSearch = () => {
+  //   // Implement your search logic based on the searchQuery state
+  //   // Update the filteredMarkers state accordingly
+  //   const filtered = markers.filter((marker) =>
+  //     marker.popUp.toLowerCase().includes(searchQuery.toLowerCase())
+  //   );
+  //   setFilteredMarkers(filtered);
+  //   console.log(filtered)
+  // };
+
+  const handleSearch = () => {
+
+    fetch(`http://127.0.0.1:8000/api/search_outlets/?query=${searchQuery}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const filtered = data.map((item) => ({
+          geocode: [item.latitude, item.longitude],
+          popUp: item.name,
+          isWithinRadius: false
+        }));
+        setFilteredMarkers(filtered);
+      })
+      .catch((error) => console.error("Error fetching filtered data:", error));
+  };
+  
+
   return (
     <MapContainer center={[3.15673, 101.71225]} zoom={13} maxZoom={18}>
       <TileLayer
@@ -63,9 +92,19 @@ export default function App() {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
+      <div style={{ position: "absolute", top: 10, right: 10, zIndex: 1000 }}>
+        <input
+          type="text"
+          placeholder="Enter your query"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button onClick={handleSearch}>Search</button>
+      </div>
+
       <MarkerClusterGroup chunkedLoading iconCreateFunction={createClusterCustomIcon}>
-        {markers.map((marker, index) => {
-          const icon = isWithinRadius(marker, markers)
+        {filteredMarkers.map((marker, index) => {
+          const icon = isWithinRadius(marker, filteredMarkers)
             ? new Icon({ iconUrl: require("./icons/outlet.png"), iconSize: [38, 38] })
             : customIcon;
 
@@ -78,7 +117,7 @@ export default function App() {
       </MarkerClusterGroup>
 
       <FeatureGroup>
-        {markers.map((marker, index) => (
+        {filteredMarkers.map((marker, index) => (
           <Circle
             key={`circle-${index}`}
             center={marker.geocode}
