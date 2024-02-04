@@ -13,4 +13,5 @@
 `python manage.py scrape_website`
 `python manage.py runserver`
 4. Navigate to map-visuals directory and run command below
+`npm install`
 `npm start`
